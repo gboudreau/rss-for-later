@@ -25,6 +25,7 @@
     </style>
 </head>
 <body>
+    <a href="https://github.com/gboudreau/rss-for-later"><img style="position: absolute; top: 0; right: 0; border: 0;" src="/img/forkme_left_red_aa0000.png" alt="Fork me on GitHub"></a>
 <?php
 
 require_once('init.inc.php');
