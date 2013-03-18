@@ -164,6 +164,18 @@ function gen_uuid() {
         <?php endif; ?>
     </div>
 
+    <?php if (defined('Config::TWITTER_API_KEY') && Config::TWITTER_API_KEY != ''): ?>
+        <h3>Twitter Integration</h3>
+        <div>Connect to Twitter to also send new Tweets to Pocket.</div>
+        <div>
+            <?php if (empty($user->twitter_access_token)): ?>
+                <input type="button" onclick="window.location.href='/twitter_auth?uuid=<?php echo $uuid ?>'" value="Connect to Twitter" />
+            <?php else: ?>
+                Already connected to Twitter.
+            <?php endif; ?>
+        </div>
+    <?php endif; ?>
+
     <h3>Feeds</h3>
     <?php if (count($feeds) > 0): ?>
         <div>

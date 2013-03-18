@@ -10,6 +10,7 @@ require_once('classes/Config.php');
 require_once('classes/DB.php');
 require_once('classes/PocketAPI.php');
 require_once('classes/RSS.php');
+require_once('classes/Twitter.php');
 
 $DB = new DB();
 try {
