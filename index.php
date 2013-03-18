@@ -1,4 +1,5 @@
 <?php header('Content-type: text/html; charset=UTF-8') ?>
+<?php require_once('init.inc.php') ?>
 <html>
 <head>
     <title>RSS-For-Later - Read your RSS in Pocket</title>
@@ -23,12 +24,11 @@
             color: #e2b518;
         }
     </style>
+    <?php google_analytics() ?>
 </head>
 <body>
     <a href="https://github.com/gboudreau/rss-for-later"><img style="position: absolute; top: 0; right: 0; border: 0;" src="/img/forkme_left_red_aa0000.png" alt="Fork me on GitHub"></a>
 <?php
-
-require_once('init.inc.php');
 
 if (!empty($_GET['subscribe'])) {
     $_POST['xmlUrl'] = $_GET['subscribe'];
