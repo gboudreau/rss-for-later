@@ -118,7 +118,7 @@ function gen_uuid() {
 ?>
 
 <h2>RSS-For-Later</h2>
-<div><em>Read your RSS feeds in Pocket</em></div>
+<div><em>Read your RSS (and Twitter) feeds in Pocket</em></div>
 <br/><br/>
 <?php if (isset($uuid)): ?>
     <div>
