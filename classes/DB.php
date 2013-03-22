@@ -32,7 +32,7 @@ class DB {
         if ($escape) {
             foreach ($args as $key => $value) {
                 // mysql_real_escape_string will only escape caracters that would cause problems in mysql strings, so we need to make sure the result is used in a string, thus why we force the single quotes around it.
-                $q = preg_replace("/'?([^\\s']*)" . ":$key" . "([^\\s'),]*)'?/", '\'${1}' . mysql_real_escape_string($value) . '${2}\'', $q);
+                $q = preg_replace("/'?([^\\s']*)" . ":$key" . "([^\\s'),]*)'?/", '\'${1}' . strtr(mysql_real_escape_string($value), array('\\' => '\\\\', '$' => '\$')) . '${2}\'', $q);
             }
         } else {
             foreach ($args as $key => $value) {
