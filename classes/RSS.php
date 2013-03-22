@@ -30,6 +30,9 @@ class RSS {
             $hashes = array();
             $items = array();
             foreach ($feedXml['value']['items'] as $item) {
+                if (empty($item['link'])) {
+                    continue;
+                }
                 $hash = self::get_item_hash($item);
                 $hashes[$hash] = TRUE;
                 $items[$hash] = (object) array(
@@ -80,10 +83,6 @@ class RSS {
     }
 
     public function get_item_hash($item) {
-        if (!isset($item['pubDate'])) {
-            //error_log("Missing pubDate:");
-            //error_log(var_export($item, TRUE));
-        }
         return md5($item['link'] . @$item['guid']['content'] . @$item['pubDate'] . @$item['y:id']['value']);
 	}
 
