@@ -206,6 +206,6 @@ function gen_uuid() {
     </ul>
 <?php endif; ?>
         <br/>
-        <footer>Pocket-RSS was created in a couple hours. Comments about the UI are NOT welcome! :)<br/>by <a href="http://www.pommepause.com/" rel="author">Guillaume Boudreau</a> | <a href="http://www.pommepause.com/contact.php">Contact</a></footer>
+        <footer>RSS-For-Later was created in a couple hours. Comments about the UI are NOT welcome! :)<br/>by <a href="http://www.pommepause.com/" rel="author">Guillaume Boudreau</a> | <a href="http://www.pommepause.com/contact.php">Contact</a></footer>
 </body>
 </html>
