@@ -81,13 +81,19 @@ if (!empty($_POST['email'])) {
     }
 
     $xml = simplexml_load_file($_FILES['opml']['tmp_name']);
+    $subs = 0;
     foreach ($xml->body->outline as $subscription) {
         $title = (string) $subscription['title'];
         $xmlUrl = (string) $subscription['xmlUrl'];
         $q = "INSERT INTO users_feeds SET title = ':title', xmlUrl = ':xmlUrl', user_id = :user_id";
-        DB::insert($q, array('title' => $title, 'xmlUrl' => $xmlUrl, 'user_id' => $user_id));
+        try {
+            DB::insert($q, array('title' => $title, 'xmlUrl' => $xmlUrl, 'user_id' => $user_id));
+            $subs++;
+        } catch (Exception $ex) {
+            error_log($ex->getMessage());
+        }
     }
-    echo "Successfully imported " . count($xml->body->outline) . " subscriptions.";
+    echo "Successfully imported $subs subscriptions.";
     echo "Initiating an initial load of all your subscriptions.";
     echo "<!--";
     RSS::downloadRSS($uuid, TRUE); // $initial_load = TRUE
