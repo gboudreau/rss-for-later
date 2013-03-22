@@ -127,9 +127,8 @@ function gen_uuid() {
     </div>
     <br/>
     <div>
-        More Tips: If you have the RSS Subscription Extension (by Google) installed, you can subscribe to feeds using it by configuring the following URL:<br/>
+        More Tips: If you have the Chrome <a href="https://chrome.google.com/webstore/detail/rss-subscription-extensio/bmjffnfcokiodbeiamclanljnaheeoke" target="_blank">RSS Subscription Extension</a> installed (or an equivalent extension in other browsers), you can subscribe to feeds using it by configuring the following URL:<br/>
         &nbsp; http://rss-for-later.pommepause.com/?uuid=<?php echo $uuid ?>&subscribe=%s<br/>
-        If you want that extension, I made it available for download <a href="https://dl.dropbox.com/s/5gde89t5uncsk2q/rss-subscribe-chrome-extension.crx?token_hash=AAGE2QHdGivEeIRasLNhhxqn6_8OvACjyDIJIPGEx05Qzw&dl=1">here</a> (Google removed it from the Chrome Web Store).
     </div>
 <?php else: ?>
     <form action="" method="post">
