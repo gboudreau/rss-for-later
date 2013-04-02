@@ -70,7 +70,7 @@ if (!empty($_POST['email'])) {
     }
 
     $q = "DELETE FROM users_feeds WHERE id = :feed_id AND user_id = :user_id";
-    DB::insert($q, array('feed_id' => $_POST['feed_id'], 'user_id' => $user_id));
+    DB::execute($q, array('feed_id' => $_POST['feed_id'], 'user_id' => $user_id));
     echo "Successfully unsubscribed from <a href='" . htmlentities($_POST['xmlUrl'], ENT_QUOTES, 'UTF-8') . "'>" . htmlentities($_POST['title'], ENT_QUOTES, 'UTF-8') . "</a>";
 } else if (!empty($_POST['xmlUrl'])) {
     $q = "SELECT id FROM users WHERE uuid = ':uuid'";
