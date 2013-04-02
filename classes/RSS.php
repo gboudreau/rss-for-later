@@ -39,7 +39,7 @@ class RSS {
                     'url' => $item['link'],
                     'title' => $item['title'],
                     'tags' => array('RSS', $item['feedTitle']),
-                    'content' => '<h2>' . $item['title'] . '</h2>' . $item['description'] . '<br/><br/>[' . $item['link'] . '|' . @$item['guid']['content'] . '|' . @$item['pubDate'] . '|' . @$item['y:id']['value'].']'
+                    'content' => '<h2>' . $item['title'] . '</h2>' . $item['description'] // . '<br/><br/>[' . $item['link'] . '|' . @$item['guid']['content'] . '|' . @$item['pubDate'] . '|' . @$item['y:id']['value'].']'
                 );
             }
 
