@@ -45,7 +45,7 @@ if (!empty($_POST['mirror_articles_locally'])) {
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 </head>
 <body>
-    <a href="https://github.com/gboudreau/rss-for-later"><img style="position: absolute; top: 0; right: 0; border: 0;" src="/img/forkme_left_red_aa0000.png" alt="Fork me on GitHub"></a>
+    <a href="https://github.com/gboudreau/rss-for-later" target="_blank"><img style="position: absolute; top: 0; right: 0; border: 0;" src="/img/forkme_left_red_aa0000.png" alt="Fork me on GitHub"></a>
 <?php
 
 if (!empty($_GET['subscribe'])) {
