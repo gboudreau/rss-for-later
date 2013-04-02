@@ -1,5 +1,22 @@
+<?php
+require_once('init.inc.php');
+
+// AJAX requests
+if (!empty($_POST['mirror_articles_locally'])) {
+    $q = "SELECT id FROM users WHERE uuid = ':uuid'";
+    $user_id = DB::getFirstValue($q, array('uuid' => $uuid));
+    if (!$user_id) {
+        die("Unknown secret.");
+    }
+
+    $q = "UPDATE users_feeds SET mirror_articles_locally = ':mirror_articles_locally' WHERE id = :feed_id AND user_id = :user_id";
+    DB::execute($q, array('feed_id' => $_POST['feed_id'], 'mirror_articles_locally' => $_POST['mirror_articles_locally'], 'user_id' => $user_id));
+
+    header('Content-type: text/plain; charset=UTF-8');
+    die('true');
+}
+?>
 <?php header('Content-type: text/html; charset=UTF-8') ?>
-<?php require_once('init.inc.php') ?>
 <html>
 <head>
     <title>RSS-For-Later - Read your RSS in Pocket</title>
@@ -25,6 +42,7 @@
         }
     </style>
     <?php google_analytics() ?>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 </head>
 <body>
     <a href="https://github.com/gboudreau/rss-for-later"><img style="position: absolute; top: 0; right: 0; border: 0;" src="/img/forkme_left_red_aa0000.png" alt="Fork me on GitHub"></a>
@@ -204,11 +222,24 @@ function gen_uuid() {
                     <input type="hidden" name="title" value="<?php echo htmlentities($feed->title, ENT_QUOTES, 'UTF-8') ?>" />
                     <input type="hidden" name="xmlUrl" value="<?php echo htmlentities($feed->xmlUrl, ENT_QUOTES, 'UTF-8') ?>" />
                     <a href="<?php echo htmlentities($feed->xmlUrl, ENT_QUOTES, 'UTF-8') ?>" target="_blank"><?php echo htmlentities($feed->title, ENT_COMPAT, 'UTF-8') ?></a>
-                    <input type="submit" name="delete" value="Unsubscribe" />
+                    <input type="submit" name="delete" onclick="if(!confirm('Are you sure?')){return false;}" value="Unsubscribe" /><br/>
+                    Send to Pocket:
+                    [<input type="radio" onchange="save_mirror_articles(<?php echo $feed->id ?>, 'false')" name="mirror_articles_locally" value="false" id="mirror_articles_locally-false" <?php if ($feed->mirror_articles_locally == 'false') { echo 'checked="checked"'; } ?> /><label for="mirror_articles_locally-false">Links</label> |
+                    <input type="radio" onchange="save_mirror_articles(<?php echo $feed->id ?>, 'true')" name="mirror_articles_locally" value="true" id="mirror_articles_locally-true" <?php if ($feed->mirror_articles_locally == 'true') { echo 'checked="checked"'; } ?> /><label for="mirror_articles_locally-true">Content</label>]
+                    of articles
                 </form>
             </li>
         <?php endforeach; ?>
     </ul>
+    <script>
+    function save_mirror_articles(feed_id, mirror_articles_locally) {
+        $.ajax({
+            type: 'POST',
+            url: '/?debug_sql=y',
+            data: 'uuid=<?php echo $uuid ?>&feed_id=' + feed_id + '&mirror_articles_locally=' + mirror_articles_locally
+        });
+    }
+    </script>
 <?php endif; ?>
         <br/>
         <footer>RSS-For-Later was created in a couple hours. Comments about the UI are NOT welcome! :)<br/>by <a href="http://www.pommepause.com/" rel="author">Guillaume Boudreau</a> | <a href="http://www.pommepause.com/contact.php">Contact</a></footer>
