@@ -4,7 +4,12 @@ chdir('..');
 require_once('init.inc.php');
 
 if (!isset($uuid)) {
-    die('Missing UUID parameter.');
+    if (!empty($_GET['shared'])) {
+        $q = "SELECT * FROM users WHERE id = ':id'";
+        $user = DB::getFirst($q, array('id' => substr(base64_decode($_GET['shared']), strlen(Config::YAHOO_PIPE_ID))));
+    } else {
+        die('Missing UUID parameter.');
+    }
 }
 if (!isset($_GET['aid'])) {
     die('Missing Article ID (aid) parameter.');
@@ -20,4 +25,8 @@ if (!$content) {
 
 header('Content-type: text/html; charset=utf-8');
 echo $content;
+
+if (empty($_GET['shared'])) {
+    ?><hr/><a href="/local/?aid=<?php echo $_GET['aid'] ?>&shared=<?php echo trim(base64_encode(Config::YAHOO_PIPE_ID . $user->id), '=') ?>" target="_blank">Share this</a><?php
+}
 ?>
