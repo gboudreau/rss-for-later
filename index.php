@@ -170,7 +170,7 @@ function gen_uuid() {
     <h3>OPML</h3>
     <form action="" method="post" enctype="multipart/form-data">
         <input type="hidden" name="uuid" value="<?php echo $uuid ?>" />
-        <input type="file" name="opml" /><br/>
+        <input type="file" name="opml" />
         <input type="submit" value="Upload OPML" />
     </form>
 
