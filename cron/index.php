@@ -5,6 +5,7 @@ require_once('init.inc.php');
 
 if (isset($uuid)) {
     RSS::downloadRSS($uuid);
+    Twitter::downloadTimeline($uuid);
     exit();
 }
 
