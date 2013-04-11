@@ -2,7 +2,7 @@
 require_once('init.inc.php');
 
 // AJAX requests
-if (!empty($_POST['mirror_articles_locally'])) {
+if (!empty($_POST['mirror_articles_locally']) && empty($_POST['delete'])) {
     $q = "SELECT id FROM users WHERE uuid = ':uuid'";
     $user_id = DB::getFirstValue($q, array('uuid' => $uuid));
     if (!$user_id) {
