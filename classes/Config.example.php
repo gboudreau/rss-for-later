@@ -16,6 +16,7 @@ class Config {
     // Change those to fit your installation hostname.
     const OPML_URL            = 'http://rss-for-later.pommepause.com/opml/?uuid=$uuid';
     const LOCAL_COPY_URL      = 'http://rss-for-later.pommepause.com/local/?uuid=$uuid&aid=$aid';
+    const BASE_URL            = 'http://rss-for-later.pommepause.com';
 
     // Allow users to send their Twitter Home Timeline (tweets from users they follow) to Pocket.
     // Create a new app at https://dev.twitter.com/apps

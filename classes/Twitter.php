@@ -127,7 +127,7 @@ class Twitter {
     }
 
     public static function getRedirectURL($uuid) {
-        return 'http://rss-for-later.pommepause.com/twitter_auth/?uuid=' . $uuid;
+        return Config::BASE_URL . '/twitter_auth/?uuid=' . $uuid;
     }
 
     public static function getRequestToken($uuid) {

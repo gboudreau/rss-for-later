@@ -147,12 +147,12 @@ function gen_uuid() {
 <?php if (isset($uuid)): ?>
     <div>
         Important: Use this secret URL to come back to your account later:<br/>
-        &nbsp; <a href="http://rss-for-later.pommepause.com/?uuid=<?php echo $uuid ?>">http://rss-for-later.pommepause.com/?uuid=<?php echo $uuid ?></a>
+        &nbsp; <a href="<?php Config::BASE_URL ?>/?uuid=<?php echo $uuid ?>"><?php echo Config::BASE_URL ?>/?uuid=<?php echo $uuid ?></a>
     </div>
     <br/>
     <div>
         Tip: If you have the Chrome <a href="https://chrome.google.com/webstore/detail/rss-subscription-extensio/nlbjncdgjeocebhnmkbbbdekmmmcbfjd" target="_blank">RSS Subscription Extension (by Google)</a> installed (or an equivalent extension in other browsers), you can subscribe to feeds using it by configuring the following URL:<br/>
-        &nbsp; http://rss-for-later.pommepause.com/?uuid=<?php echo $uuid ?>&subscribe=%s<br/>
+        &nbsp; <?php Config::BASE_URL ?>/?uuid=<?php echo $uuid ?>&subscribe=%s<br/>
     </div>
 <?php else: ?>
     <form action="" method="post">
