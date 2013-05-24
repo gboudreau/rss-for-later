@@ -31,7 +31,7 @@ class PocketAPI {
     }
 
     public static function getRedirectURL($uuid) {
-        return 'http://rss-for-later.pommepause.com/pocket_auth/?uuid=' . $uuid . '&authorized=y';
+        return CONFIG::BASE_URL . '/pocket_auth/?uuid=' . $uuid . '&authorized=y';
     }
 
     public static function getRequestToken($uuid) {
