@@ -63,7 +63,8 @@ class RSS {
                         $q = "INSERT INTO local_articles SET user_id = ':user_id', feed_id = :feed_id, content=':content'";
                         $local_article_id = DB::insert($q, array('user_id' => $user->id, 'feed_id' => $feed->id, 'content' => $items[$hash]->content));
 
-                        $items[$hash]->url = str_replace(array('$uuid', '$aid'), array($uuid, $local_article_id), Config::LOCAL_COPY_URL);
+                        $items[$hash]->url = str_replace(array('$hash', '$aid'), array(trim(base64_encode(Config::YAHOO_PIPE_ID . $user->id), '='), $local_article_id), Config::LOCAL_COPY_URL);
+
                         self::log("  Will use local URL: " . $items[$hash]->url);
                     }
                 }

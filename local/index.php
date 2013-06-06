@@ -26,7 +26,4 @@ if (!$content) {
 header('Content-type: text/html; charset=utf-8');
 echo $content;
 
-if (empty($_GET['shared'])) {
-    ?><hr/><a href="/local/?aid=<?php echo $_GET['aid'] ?>&shared=<?php echo trim(base64_encode(Config::YAHOO_PIPE_ID . $user->id), '=') ?>" target="_blank">Share this</a><?php
-}
 ?>
