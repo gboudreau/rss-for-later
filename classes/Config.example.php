@@ -10,8 +10,11 @@ class Config {
     // Ref: http://getpocket.com/developer/
     const POCKET_API_KEY      = '12437-000000000000000000000000';
 
-    // The pipe used to inject the feed title into each item. You probably want to leave this as-in.
+    // The pipe used to inject the feed title into each item. You probably want to leave this as-is.
     const YAHOO_PIPE_INJECT_ID = 'bb7eaa73a7a36d7b2dabb534461940ee';
+
+    // The salt used to hide the user ID in local URLs. Make this unique (in content and length).
+    const SHARING_SALT        = 'kajhfg2375salj2984kj';
 
     // Change those to fit your installation hostname.
     const OPML_URL            = 'http://rss-for-later.pommepause.com/opml/?uuid=$uuid';
@@ -24,6 +27,9 @@ class Config {
     //    and Callback URL: http://www.your_domain.com/rss-for-later/twitter_auth/
     const TWITTER_API_KEY     = '';
     const TWITTER_API_SECRET  = '';
+
+    // (Optional) For Google Analytics
+    // const GOOGLE_ANALYTICS_ID = 'UA-12345-1';
 }
 
 date_default_timezone_set('UTC');

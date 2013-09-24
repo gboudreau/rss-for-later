@@ -6,7 +6,7 @@ require_once('init.inc.php');
 if (!isset($uuid)) {
     if (!empty($_GET['shared'])) {
         $q = "SELECT * FROM users WHERE id = ':id'";
-        $user = DB::getFirst($q, array('id' => substr(base64_decode($_GET['shared']), strlen(Config::YAHOO_PIPE_ID))));
+        $user = DB::getFirst($q, array('id' => substr(base64_decode($_GET['shared']), strlen(Config::SHARING_SALT))));
     } else {
         die('Missing UUID parameter.');
     }
