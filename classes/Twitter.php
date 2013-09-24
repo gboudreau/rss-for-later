@@ -25,6 +25,10 @@ class Twitter {
 
         $tweets = self::getHomeTimeline($user->twitter_access_token, $user->twitter_access_token_secret);
 
+        if ($tweets === FALSE) {
+            return;
+        }
+
         self::log("  Received " . count($tweets) . " tweets.");
 
         $hashes = array();
@@ -109,7 +113,11 @@ class Twitter {
         if ($code == 200) {
             $response = json_decode($tmhOAuth->response['response']);
         } else {
-            error_log("TwitterAPI error (code 1-$code): " . $tmhOAuth->response['response']);
+            error_log("TwitterAPI error (code 1-$code): " . $tmhOAuth->response['response'] . ". Access token: $access_token");
+            if ($code == 401) {
+                $q = "UPDATE users SET twitter_access_token = NULL WHERE twitter_access_token = ':access_token'";
+                DB::execute($q, array('access_token' => $access_token));
+            }
             $response = FALSE;
         }
         return $response;

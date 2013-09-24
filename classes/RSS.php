@@ -72,7 +72,10 @@ class RSS {
                 if (!$initial_load && !empty($items)) {
                     // Send items to Pocket
                     self::log("  Sending to Pocket API...");
-                    PocketAPI::sendToPocket($user->pocket_access_token, array_values($items));
+                    $result = PocketAPI::sendToPocket($user->pocket_access_token, array_values($items));
+                    if (!$result) {
+                        return;
+                    }
                 }
 
                 if (!empty($values)) {

@@ -11,6 +11,10 @@ class PocketAPI {
         $method_url = 'https://getpocket.com/v3/send';
         $payload = array('actions' => array());
 
+        if (!is_array($items)) {
+            return;
+        }
+
         foreach ($items as $item) {
             $action = array(
                 'action' => 'add',
@@ -71,7 +75,15 @@ class PocketAPI {
         $response = curl_exec($ch);
         $info = curl_getinfo($ch);
         if ($info['http_code'] != 200 || !$response) {
-            error_log("Error using cURL to connect to the Pocket API: " . curl_error($ch) . ". HTTP response code: " . $info['http_code']);
+            $payload = json_decode($json);
+
+            error_log("Error using cURL to connect to the Pocket API: " . curl_error($ch) . ". HTTP response code: " . $info['http_code'] . ". Access token: " . $payload->access_token);
+
+            if ($info['http_code'] == 401) {
+                $q = "UPDATE users SET pocket_access_token = NULL WHERE pocket_access_token = ':access_token'";
+                DB::execute($q, array('access_token' => $payload->access_token));
+            }
+            
             return FALSE;
         }
         return json_decode($response);
