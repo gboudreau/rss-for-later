@@ -34,7 +34,7 @@ class Twitter {
         $hashes = array();
         $items = array();
         foreach ($tweets as $tweet) {
-            $hash = self::get_item_hash($tweet);
+            $hash = static::get_item_hash($tweet);
             $hashes[$hash] = TRUE;
 
             $url = "https://twitter.com/" . $tweet->user->screen_name . "/status/" . $tweet->id_str;
@@ -123,7 +123,7 @@ class Twitter {
         return $response;
     }
 
-    public function get_item_hash($item) {
+    private static function get_item_hash($item) {
         return md5($item->id_str);
 	}
 
