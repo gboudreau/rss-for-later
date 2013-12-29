@@ -80,7 +80,7 @@ class PocketAPI {
             error_log("Error using cURL to connect to the Pocket API: " . curl_error($ch) . ". HTTP response code: " . $info['http_code'] . ". Access token: " . $payload->access_token);
 
             if ($info['http_code'] == 401) {
-                $q = "UPDATE users SET pocket_access_token = NULL WHERE pocket_access_token = ':access_token'";
+                $q = "UPDATE users SET pocket_access_token = NULL WHERE pocket_access_token = :access_token";
                 DB::execute($q, array('access_token' => $payload->access_token));
             }
             

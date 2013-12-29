@@ -9,7 +9,7 @@ if (isset($_GET['oauth_verifier'])) {
     var_dump($secret);
 
     if (!empty($access_token)) {
-        $q = "UPDATE users SET twitter_access_token = ':token', twitter_access_token_secret = ':secret', twitter_request_token = NULL WHERE uuid = ':uuid'";
+        $q = "UPDATE users SET twitter_access_token = :token, twitter_access_token_secret = :secret, twitter_request_token = NULL WHERE uuid = :uuid";
         DB::execute($q, array('token' => $access_token, 'secret' => $secret, 'uuid' => $uuid));
 
         Twitter::downloadTimeline($uuid, TRUE); // $initial_load = TRUE
@@ -28,7 +28,7 @@ if (isset($_GET['oauth_verifier'])) {
         if ($user->twitter_request_token === FALSE) {
             die("Fatal error while getting Twitter Request Token.");
         }
-        $q = "UPDATE users SET twitter_request_token = ':token' WHERE uuid = ':uuid'";
+        $q = "UPDATE users SET twitter_request_token = :token WHERE uuid = :uuid";
         DB::execute($q, array('token' => $user->twitter_request_token, 'uuid' => $uuid));
     }
 

@@ -5,7 +5,7 @@ require_once('init.inc.php');
 
 if (!isset($uuid)) {
     if (!empty($_GET['shared'])) {
-        $q = "SELECT * FROM users WHERE id = ':id'";
+        $q = "SELECT * FROM users WHERE id = :id";
         $user = DB::getFirst($q, array('id' => substr(base64_decode($_GET['shared']), strlen(Config::SHARING_SALT))));
     } else {
         die('Missing UUID parameter.');
@@ -15,7 +15,7 @@ if (!isset($_GET['aid'])) {
     die('Missing Article ID (aid) parameter.');
 }
 
-$q = "SELECT content FROM local_articles WHERE user_id = ':user_id' AND id = :article_id";
+$q = "SELECT content FROM local_articles WHERE user_id = :user_id AND id = :article_id";
 $content = DB::getFirstValue($q, array('user_id' => $user->id, 'article_id' => $_GET['aid']));
 
 if (!$content) {

@@ -1,97 +1,124 @@
 <?php
 
 class DB {
-	private $handle;
+    private static $handle;
 
-	public function connect() {
-		$host = Config::DB_HOST;
-		$password = Config::DB_PWD;
-
-		ini_set('mysql.connect_timeout', 10);
-		$this->handle = mysql_connect($host, Config::DB_USER, $password);
-		if (!$this->handle) {
-			throw new Exception("Can't connect to the database. Please try again later. Error: " . mysql_error());
-		}
-		$result = mysql_select_db(Config::DB_NAME);
-		if (!$result) {
-			throw new Exception("Database isn't available. Please try again later. Error: " . mysql_error());
-		}
-        //self::execute("SET NAMES 'utf8' COLLATE 'utf8_general_ci'");
-		mysql_set_charset('utf8');
-	}
-	
-	public static function sortArgs($a, $b) {
-		if (strlen($a) == strlen($b)) {
-			return 0;
-		}
-		return strlen($a) > strlen($b) ? -1 : 1;
-	}
-
-	public static function execute($q, $args = array(), $escape=TRUE) {
-		uksort($args, array('DB', 'sortArgs'));
-        if ($escape) {
-            foreach ($args as $key => $value) {
-                // mysql_real_escape_string will only escape caracters that would cause problems in mysql strings, so we need to make sure the result is used in a string, thus why we force the single quotes around it.
-                $q = preg_replace("/'?([^\\s']*)" . ":$key" . "([^\\s'),]*)'?/", '\'${1}' . strtr(mysql_real_escape_string($value), array('\\' => '\\\\', '$' => '\$')) . '${2}\'', $q);
+    public static function connect() {
+        try {
+            // Example connect string: 'mysql:host=localhost;port=9005;dbname=test', 'sqlite:/tmp/foo.db'
+            $connect_string = Config::DB_ENGINE . ':';
+            if (defined('Config::DB_FILE')) {
+                $connect_string .= Config::DB_FILE;
+            } else if (defined('Config::DB_HOST')) {
+                $connect_string .= 'host=' . Config::DB_HOST;
+                if (defined('Config::DB_PORT')) {
+                    $connect_string .= ';port=' . Config::DB_PORT;
+                }
+                if (defined('Config::DB_NAME')) {
+                    $connect_string .= ';dbname=' . Config::DB_NAME;
+                }
+                $connect_string .= ';charset=utf8';
             }
-        } else {
-            foreach ($args as $key => $value) {
-                $q = str_replace(":$key", $value, $q);
+            if (defined('Config::DB_PWD')) {
+                static::$handle = new PDO($connect_string, Config::DB_USER, Config::DB_PWD, array(PDO::ATTR_TIMEOUT => 10, PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
+            } else {
+                static::$handle = new PDO($connect_string, null, null, array(PDO::ATTR_TIMEOUT => 10, PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION));
             }
+        } catch (PDOException $e) {
+            throw new Exception("Can't connect to the database. Please try again later. Error: " . $e->getMessage());
         }
-		if (DEBUGSQL) echo "$q<br/>\n";
-		$r = mysql_query($q);
-		if (!$r) {
-			throw new Exception("Can't execute query: $q; error: " . mysql_error(), mysql_errno());
-		}
-		return $r;
-	}
+    }
 
-	public static function insert($q, $args = array()) {
-		$r = static::execute($q, $args);
-		return static::lastInsertedId();
-	}
+    public static function execute($q, $args = array()) {
+        $stmt = static::$handle->prepare($q);
+        foreach ($args as $key => $value) {
+            $stmt->bindValue(":$key", $value);
+        }
+        try {
+            $stmt->execute();
+            return $stmt;
+        } catch (PDOException $e) {
+            throw new Exception("Can't execute query: $q; error: " . $e->getMessage(), (int) $stmt->errorCode());
+        }
+    }
 
-	public static function getFirst($q, $args = array()) {
-		$r = static::execute($q, $args);
-		return mysql_fetch_object($r);
-	}
-	public static function getFirstValue($q, $args = array()) {
-		$r = static::execute($q, $args);
-		$row = mysql_fetch_array($r);
-		if (!is_array($row)) {
-			return FALSE;
-		}
-		return array_shift($row);
-	}
+    public static function insert($q, $args = array()) {
+        DB::execute($q, $args);
+        return DB::lastInsertedId();
+    }
 
-	public static function getAll($q, $args = array(), $escape=TRUE) {
-		$r = static::execute($q, $args, $escape);
-		$rows = array();
-		while ($row = mysql_fetch_object($r)) {
-			$rows[] = $row;
-		}
-		return $rows;
-	}
-	public static function getAllValues($q, $args = array()) {
-		$r = static::execute($q, $args);
-		$values = array();
-		while ($row = mysql_fetch_array($r)) {
-			if (!is_array($row)) {
-				return FALSE;
-			}
+    public static function getFirst($q, $args = array()) {
+        $stmt = DB::execute($q, $args);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        if ($result === FALSE) {
+            return FALSE;
+        }
+        return (object) $result;
+    }
 
-			$values[] = array_shift($row);
-		}
-		return $values;
-	}
+    public static function getFirstValue($q, $args = array()) {
+        $stmt = DB::execute($q, $args);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!is_array($row)) {
+            return FALSE;
+        }
+        return array_shift($row);
+    }
 
-	public static function lastInsertedId() {
-		return mysql_insert_id();
-	} 
+    public static function getAll($q, $args = array()) {
+        $stmt = DB::execute($q, $args);
+        $rows = array();
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $rows[] = (object) $row;
+        }
+        return $rows;
+    }
 
-    public static function getLocalTZ($field) {
-        return "CONVERT_TZ($field, '+00:00', '" . date('P') . "') AS $field"."_local";
+    public static function getAllValues($q, $args = array(), $data_type=null) {
+        $stmt = DB::execute($q, $args);
+        $values = array();
+        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            if (!is_array($row)) {
+                return FALSE;
+            }
+
+            $value = array_shift($row);
+            if (!empty($data_type)) {
+                settype($value, $data_type);
+            }
+            $values[] = $value;
+        }
+        return $values;
+    }
+
+    public static function lastInsertedId() {
+        if (Config::DB_ENGINE == 'mysql') {
+            $q = "SELECT LAST_INSERT_ID()";
+            return DB::getFirstValue($q);
+        }
+        return TRUE;
+    }
+
+    public static function getDomainObjects($table_name, $order_by=null) {
+        $q = "SELECT * FROM $table_name";
+        if (!empty($order_by)) {
+            $q .= " ORDER BY $order_by";
+        }
+        return DB::getAll($q);
+    }
+
+    const GROUP_CONCAT_SEP = 'Ω'; // Something that won't appear in the strings I GROUP_CONCAT(), to be able to explode them.
+
+    public static function groupConcatQuery($field, $as_what) {
+        $q = "GROUP_CONCAT(DISTINCT $field ORDER BY $field ASC SEPARATOR '" . DB::GROUP_CONCAT_SEP . "') AS `$as_what`";
+        return $q;
+    }
+
+    public static function groupConcatParse(&$list) {
+        if ($list != null) {
+            $list = explode(DB::GROUP_CONCAT_SEP, $list);
+        } else {
+            $list = array();
+        }
     }
 }
-?>

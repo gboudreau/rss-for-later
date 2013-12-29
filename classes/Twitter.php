@@ -11,7 +11,7 @@ require_once('libs/tmhOAuth.php');
 class Twitter {
 
     public static function downloadTimeline($uuid, $initial_load=FALSE) {
-        $q = "SELECT * FROM users WHERE uuid = ':uuid'";
+        $q = "SELECT * FROM users WHERE uuid = :uuid";
         $user = DB::getFirst($q, array('uuid' => $uuid));
 
         $q = "SELECT id, mirror_articles_locally FROM users_feeds WHERE user_id = :user_id AND title = 'Twitter'";
@@ -63,7 +63,7 @@ class Twitter {
 
                 if ($feed->mirror_articles_locally == 'true') {
                     // Save the article content locally, and send to Pocket this new URL.
-                    $q = "INSERT INTO local_articles SET user_id = ':user_id', feed_id = :feed_id, content=':content'";
+                    $q = "INSERT INTO local_articles SET user_id = :user_id, feed_id = :feed_id, content=:content";
                     $local_article_id = DB::insert($q, array('user_id' => $user->id, 'feed_id' => $feed->id, 'content' => $items[$hash]->content));
 
                     $items[$hash]->url = str_replace(array('$uuid', '$aid'), array($uuid, $local_article_id), Config::LOCAL_COPY_URL);
@@ -115,7 +115,7 @@ class Twitter {
         } else {
             error_log("TwitterAPI error (code 1-$code): " . $tmhOAuth->response['response'] . ". Access token: $access_token");
             if ($code == 401) {
-                $q = "UPDATE users SET twitter_access_token = NULL WHERE twitter_access_token = ':access_token'";
+                $q = "UPDATE users SET twitter_access_token = NULL WHERE twitter_access_token = :access_token";
                 DB::execute($q, array('access_token' => $access_token));
             }
             $response = FALSE;

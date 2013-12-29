@@ -7,7 +7,7 @@ if (!isset($uuid)) {
     die('Missing UUID parameter.');
 }
 
-$q = "SELECT uf.* FROM users u JOIN users_feeds uf ON (u.id = uf.user_id) WHERE u.uuid = ':uuid'";
+$q = "SELECT uf.* FROM users u JOIN users_feeds uf ON (u.id = uf.user_id) WHERE u.uuid = :uuid";
 $feeds = DB::getAll($q, array('uuid' => $uuid));
 
 function xml_entities($string) {

@@ -3,13 +3,13 @@ require_once('init.inc.php');
 
 // AJAX requests
 if (!empty($_POST['mirror_articles_locally']) && empty($_POST['delete'])) {
-    $q = "SELECT id FROM users WHERE uuid = ':uuid'";
+    $q = "SELECT id FROM users WHERE uuid = :uuid";
     $user_id = DB::getFirstValue($q, array('uuid' => $uuid));
     if (!$user_id) {
         die("Unknown secret.");
     }
 
-    $q = "UPDATE users_feeds SET mirror_articles_locally = ':mirror_articles_locally' WHERE id = :feed_id AND user_id = :user_id";
+    $q = "UPDATE users_feeds SET mirror_articles_locally = :mirror_articles_locally WHERE id = :feed_id AND user_id = :user_id";
     DB::execute($q, array('feed_id' => $_POST['feed_id'], 'mirror_articles_locally' => $_POST['mirror_articles_locally'], 'user_id' => $user_id));
 
     header('Content-type: text/plain; charset=UTF-8');
@@ -54,7 +54,7 @@ if (!empty($_GET['subscribe'])) {
 
 if (!empty($_POST['email'])) {
     $uuid = gen_uuid();
-    $q = "INSERT INTO users SET email = ':email', uuid = ':uuid'";
+    $q = "INSERT INTO users SET email = :email, uuid = :uuid";
     try {
         DB::insert($q, array('email' => $_POST['email'], 'uuid' => $uuid));
         header('Location: /?uuid=' . $uuid);
@@ -63,7 +63,7 @@ if (!empty($_POST['email'])) {
         // @TODO
     }
 } else if (!empty($_POST['delete'])) {
-    $q = "SELECT id FROM users WHERE uuid = ':uuid'";
+    $q = "SELECT id FROM users WHERE uuid = :uuid";
     $user_id = DB::getFirstValue($q, array('uuid' => $uuid));
     if (!$user_id) {
         die("Unknown secret.");
@@ -73,7 +73,7 @@ if (!empty($_POST['email'])) {
     DB::execute($q, array('feed_id' => $_POST['feed_id'], 'user_id' => $user_id));
     echo "Successfully unsubscribed from <a href='" . htmlentities($_POST['xmlUrl'], ENT_QUOTES, 'UTF-8') . "'>" . htmlentities($_POST['title'], ENT_QUOTES, 'UTF-8') . "</a>";
 } else if (!empty($_POST['xmlUrl'])) {
-    $q = "SELECT id FROM users WHERE uuid = ':uuid'";
+    $q = "SELECT id FROM users WHERE uuid = :uuid";
     $user_id = DB::getFirstValue($q, array('uuid' => $uuid));
     if (!$user_id) {
         die("Unknown secret.");
@@ -88,11 +88,11 @@ if (!empty($_POST['email'])) {
         $_POST['title'] = $feed->get_title();
     }
 
-    $q = "INSERT INTO users_feeds SET xmlUrl = ':xmlUrl', title = ':title', user_id = :user_id";
+    $q = "INSERT INTO users_feeds SET xmlUrl = :xmlUrl, title = :title, user_id = :user_id";
     DB::insert($q, array('xmlUrl' => $_POST['xmlUrl'], 'title' => $_POST['title'], 'user_id' => $user_id));
     echo "Successfully subscribed to <a href='" . htmlentities($_POST['xmlUrl'], ENT_QUOTES, 'UTF-8') . "'>" . htmlentities($_POST['title'], ENT_QUOTES, 'UTF-8') . "</a>";
 } else if (isset($_FILES['opml']['name'])) {
-    $q = "SELECT id FROM users WHERE uuid = ':uuid'";
+    $q = "SELECT id FROM users WHERE uuid = :uuid";
     $user_id = DB::getFirstValue($q, array('uuid' => $uuid));
     if (!$user_id) {
         die("Unknown secret.");
@@ -103,7 +103,7 @@ if (!empty($_POST['email'])) {
     foreach ($xml->body->outline as $subscription) {
         $title = (string) $subscription['title'];
         $xmlUrl = (string) $subscription['xmlUrl'];
-        $q = "INSERT INTO users_feeds SET title = ':title', xmlUrl = ':xmlUrl', user_id = :user_id";
+        $q = "INSERT INTO users_feeds SET title = :title, xmlUrl = :xmlUrl, user_id = :user_id";
         try {
             DB::insert($q, array('title' => $title, 'xmlUrl' => $xmlUrl, 'user_id' => $user_id));
             $subs++;
@@ -163,7 +163,7 @@ function gen_uuid() {
 
 <?php if (isset($uuid)): ?>
     <?php
-    $q = "SELECT uf.* FROM users u JOIN users_feeds uf ON (u.id = uf.user_id) WHERE u.uuid = ':uuid' ORDER BY uf.title";
+    $q = "SELECT uf.* FROM users u JOIN users_feeds uf ON (u.id = uf.user_id) WHERE u.uuid = :uuid ORDER BY uf.title";
     $feeds = DB::getAll($q, array('uuid' => $uuid));
     ?>
 

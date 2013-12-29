@@ -9,12 +9,12 @@
 class RSS {
 
     public static function downloadRSS($uuid, $initial_load=FALSE) {
-        $q = "SELECT * FROM users WHERE uuid = ':uuid'";
+        $q = "SELECT * FROM users WHERE uuid = :uuid";
         $user = DB::getFirst($q, array('uuid' => $uuid));
 
         $user_id = $user->id;
 
-        $q = "SELECT uf.* FROM users u JOIN users_feeds uf ON (u.id = uf.user_id) WHERE u.uuid = ':uuid'";
+        $q = "SELECT uf.* FROM users u JOIN users_feeds uf ON (u.id = uf.user_id) WHERE u.uuid = :uuid";
         $feeds = DB::getAll($q, array('uuid' => $uuid));
 
         foreach ($feeds as $feed) {
@@ -60,7 +60,7 @@ class RSS {
 
                     if ($feed->mirror_articles_locally == 'true') {
                         // Save the article content locally, and send to Pocket this new URL.
-                        $q = "INSERT INTO local_articles SET user_id = ':user_id', feed_id = :feed_id, content=':content'";
+                        $q = "INSERT INTO local_articles SET user_id = :user_id, feed_id = :feed_id, content=:content";
                         $local_article_id = DB::insert($q, array('user_id' => $user->id, 'feed_id' => $feed->id, 'content' => $items[$hash]->content));
 
                         $items[$hash]->url = str_replace(array('$hash', '$aid'), array(trim(base64_encode(Config::SHARING_SALT . $user->id), '='), $local_article_id), Config::LOCAL_COPY_URL);

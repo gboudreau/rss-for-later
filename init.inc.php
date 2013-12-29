@@ -1,22 +1,16 @@
 <?php
 
-if (!empty($_GET['debug_sql'])) {
-	define('DEBUGSQL', TRUE);
-} else {
-	define('DEBUGSQL', FALSE);
-}
+spl_autoload_register(function($className) {
+    if (file_exists('classes/'.$className.'.php')) {
+        require_once('classes/'.$className.'.php');
+    }
+    return FALSE;
+});
 
-require_once('classes/Config.php');
-require_once('classes/DB.php');
-require_once('classes/PocketAPI.php');
-require_once('classes/RSS.php');
-require_once('classes/Twitter.php');
-
-$DB = new DB();
 try {
-	$DB->connect();
+    DB::connect();
 } catch (Exception $ex) {
-    die("Can't connect to database: error -1");
+    die("Couldn't connect to database. Please try again later.");
 }
 
 if (get_magic_quotes_gpc()) {
@@ -36,7 +30,7 @@ if (isset($_POST['uuid'])) {
 }
 
 if (isset($uuid)) {
-    $q = "SELECT * FROM users WHERE uuid = ':uuid'";
+    $q = "SELECT * FROM users WHERE uuid = :uuid";
     $user = DB::getFirst($q, array('uuid' => $uuid));
 }
 

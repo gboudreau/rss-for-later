@@ -1,6 +1,7 @@
 <?php
 
 class Config {
+    const DB_ENGINE           = 'mysql';
     const DB_HOST             = 'localhost';
     const DB_USER             = 'rss_for_later_user';
     const DB_PWD              = 'some_long_password';
