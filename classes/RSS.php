@@ -28,7 +28,7 @@ class RSS {
             }
             $feedXml = unserialize($response);
             if (!$feedXml) {
-                error_log("Error de-serializing reponse from Yahoo Pipes:");
+                error_log("Error de-serializing response from Yahoo Pipes:");
                 error_log(var_export($response, TRUE));
                 continue;
             }
@@ -98,7 +98,12 @@ class RSS {
     }
 
     private static function get_item_hash($item) {
-        return md5($item['link'] . @$item['guid']['content'] . @$item['pubDate'] . @$item['y:id']['value']);
+        // Bad, bad Google Alerts, inserting random IDs in links!
+        $item['link'] = preg_replace('/&ei=[^&]+/', '', $item['link']);
+
+        $hash = md5($item['link'] . @$item['guid']['content'] . @$item['pubDate'] . @$item['y:id']['value']);
+        //static::log("  Hash for (link: " . $item['link'] . ", guid: " . @$item['guid']['content'] . ", pubDate: " . @$item['pubDate'] . ", y:id: " . @$item['y:id']['value'] . "): $hash");
+        return $hash;
 	}
 
     private static function log($text) {
