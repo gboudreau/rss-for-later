@@ -61,14 +61,14 @@ class Twitter {
                 $values[$hash] = "($user->id,$feed->id,'$hash')";
                 self::log("  New article: " . $items[$hash]->title);
 
-                if ($feed->mirror_articles_locally == 'true') {
-                    // Save the article content locally, and send to Pocket this new URL.
-                    $q = "INSERT INTO local_articles SET user_id = :user_id, feed_id = :feed_id, content=:content";
-                    $local_article_id = DB::insert($q, array('user_id' => $user->id, 'feed_id' => $feed->id, 'content' => $items[$hash]->content));
-
-                    $items[$hash]->url = str_replace(array('$uuid', '$aid'), array($uuid, $local_article_id), Config::LOCAL_COPY_URL);
-                    self::log("  Will use local URL: " . $items[$hash]->url);
-                }
+//                if ($feed->mirror_articles_locally == 'true') {
+//                    // Save the article content locally, and send to Pocket this new URL.
+//                    $q = "INSERT INTO local_articles SET user_id = :user_id, feed_id = :feed_id, content=:content";
+//                    $local_article_id = DB::insert($q, array('user_id' => $user->id, 'feed_id' => $feed->id, 'content' => $items[$hash]->content));
+//
+//                    $items[$hash]->url = str_replace(array('$uuid', '$aid'), array($uuid, $local_article_id), Config::LOCAL_COPY_URL);
+//                    self::log("  Will use local URL: " . $items[$hash]->url);
+//                }
             }
 
             if (!$initial_load && !empty($items)) {
