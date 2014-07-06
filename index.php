@@ -142,18 +142,33 @@ function gen_uuid() {
 ?>
 
 <h2>RSS-For-Later</h2>
-<div><em>Read your RSS (and Twitter) feeds in Pocket</em></div>
-<br/><br/>
+<div><em>Read your <span style="text-decoration: line-through">RSS</span> (and Twitter) feeds in Pocket</em></div>
+<br/>
+
+    <div style="border: 1px solid red; background: lightgrey; padding: 10px">
+        <div style="color: red; font-weight: bold">RSS to Pocket has been discontinued</div>
+        Sorry, but RSS fetching has become too resource intensive for my poor server to handle alone.<br/>
+        That, and <a style="color: darkred" href="https://ifttt.com/recipes/9733-add-new-items-from-an-rss-feed-to-pocket">IFTTT now has a nice recipe that can do the exact same thing</a>.<br/>
+        I've been using it myself for a while, and it works the same, and sometimes better, than this service here, which I'm sorry to say has now been discontinued.<br/>
+        So starting today, all your RSS feeds will NOT be sent to Pocket anymore, and subscribing to any new feed will do nothing (except add it to your custom OPML that you can still export below).<br/>
+        Note that the <a style="color: darkred" href="https://github.com/gboudreau/rss-for-later" target="_blank">Github repository</a> still has the RSS fetching functionality enabled, so if you want to install RSS-for-Later on your own server, you can continue using this<br/>
+        <br/>
+        There is no Twitter > Pocket recipe on IFTTT (yet), so I'll keep that feature up, in case anyone else than me still use it. That's pretty low-maintenance anyway. (And I'm still using it!)<br/>
+    </div>
+    <br/>
+
 <?php if (isset($uuid)): ?>
     <div>
         Important: Use this secret URL to come back to your account later:<br/>
         &nbsp; <a href="<?php Config::BASE_URL ?>/?uuid=<?php echo $uuid ?>"><?php echo Config::BASE_URL ?>/?uuid=<?php echo $uuid ?></a>
     </div>
+    <!-- Disabled
     <br/>
     <div>
         Tip: If you have the Chrome <a href="https://chrome.google.com/webstore/detail/rss-subscription-extensio/nlbjncdgjeocebhnmkbbbdekmmmcbfjd" target="_blank">RSS Subscription Extension (by Google)</a> installed (or an equivalent extension in other browsers), you can subscribe to feeds using it by configuring the following URL:<br/>
         &nbsp; <?php Config::BASE_URL ?>/?uuid=<?php echo $uuid ?>&subscribe=%s<br/>
     </div>
+    -->
 <?php else: ?>
     <form action="" method="post">
         <input type="text" name="email" placeholder="email address" /><br/>
@@ -168,11 +183,13 @@ function gen_uuid() {
     ?>
 
     <h3>OPML</h3>
+    <!-- Disabled
     <form action="" method="post" enctype="multipart/form-data">
         <input type="hidden" name="uuid" value="<?php echo $uuid ?>" />
         <input type="file" name="opml" />
         <input type="submit" value="Upload OPML" />
     </form>
+    -->
 
     <?php if (count($feeds) > 0): ?>
         <div><a href="<?php echo str_replace('$uuid', $uuid, Config::OPML_URL) ?>">Download OPML</a></div>
@@ -202,10 +219,11 @@ function gen_uuid() {
     <h3>Feeds</h3>
     <?php if (count($feeds) > 0): ?>
         <div>
-            <a href="/cron/?uuid=<?php echo $uuid ?>" target="_blank">Refresh Feeds & Send to Pocket</a>
+            <button onclick="window.open('/cron/?uuid=<?php echo $uuid ?>')">Refresh Twitter Feed & Send to Pocket</button>
         </div>
     <?php endif; ?>
     <ul>
+        <!-- Disabled
         <li>
             <form action="" method="post">
                 <input type="hidden" name="uuid" value="<?php echo $uuid ?>" />
@@ -214,6 +232,7 @@ function gen_uuid() {
                 <input type="submit" value="Subscribe" />
             </form>
         </li>
+        -->
         <?php foreach ($feeds as $feed): ?>
             <li>
                 <form action="" method="post">
@@ -223,10 +242,12 @@ function gen_uuid() {
                     <input type="hidden" name="xmlUrl" value="<?php echo htmlentities($feed->xmlUrl, ENT_QUOTES, 'UTF-8') ?>" />
                     <a href="<?php echo htmlentities($feed->xmlUrl, ENT_QUOTES, 'UTF-8') ?>" target="_blank"><?php echo htmlentities($feed->title, ENT_COMPAT, 'UTF-8') ?></a>
                     <input type="submit" name="delete" onclick="if(!confirm('Are you sure?')){return false;}" value="Unsubscribe" /><br/>
+                    <!-- Disabled
                     Send to Pocket:
                     [<input type="radio" onchange="save_mirror_articles(<?php echo $feed->id ?>, 'false')" name="mirror_articles_locally" value="false" id="mirror_articles_locally-false" <?php if ($feed->mirror_articles_locally == 'false') { echo 'checked="checked"'; } ?> /><label for="mirror_articles_locally-false">Links</label> |
                     <input type="radio" onchange="save_mirror_articles(<?php echo $feed->id ?>, 'true')" name="mirror_articles_locally" value="true" id="mirror_articles_locally-true" <?php if ($feed->mirror_articles_locally == 'true') { echo 'checked="checked"'; } ?> /><label for="mirror_articles_locally-true">Content</label>]
                     of articles
+                    -->
                 </form>
             </li>
         <?php endforeach; ?>
