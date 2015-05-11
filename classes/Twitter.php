@@ -107,6 +107,7 @@ class Twitter {
             'exclude_replies' => 'true',
             'include_entities' => 'false'
         );
+        $tmhOAuth->config['curl_capath'] = '/etc/ssl/certs/ca-bundle.crt';
 
         $code = $tmhOAuth->request('GET', $tmhOAuth->url('1.1/statuses/home_timeline'), $request_params);
 
