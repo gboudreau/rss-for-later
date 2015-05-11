@@ -88,7 +88,7 @@ if (!empty($_POST['email'])) {
         $_POST['title'] = $feed->get_title();
     }
 
-    $q = "INSERT INTO users_feeds SET xmlUrl = :xmlUrl, title = :title, user_id = :user_id";
+    $q = "INSERT INTO users_feeds SET xmlUrl = :xmlUrl, title = :title, user_id = :user_id, mirror_articles_locally = 'true'";
     DB::insert($q, array('xmlUrl' => $_POST['xmlUrl'], 'title' => $_POST['title'], 'user_id' => $user_id));
     echo "Successfully subscribed to <a href='" . htmlentities($_POST['xmlUrl'], ENT_QUOTES, 'UTF-8') . "'>" . htmlentities($_POST['title'], ENT_QUOTES, 'UTF-8') . "</a>";
 } else if (isset($_FILES['opml']['name'])) {
