@@ -11,9 +11,6 @@ class Config {
     // Ref: http://getpocket.com/developer/
     const POCKET_API_KEY      = '12437-000000000000000000000000';
 
-    // The pipe used to inject the feed title into each item. You probably want to leave this as-is.
-    const YAHOO_PIPE_INJECT_ID = 'bb7eaa73a7a36d7b2dabb534461940ee';
-
     // The salt used to hide the user ID in local URLs. Make this unique (in content and length).
     const SHARING_SALT        = 'kajhfg2375salj2984kj';
 
@@ -34,5 +31,3 @@ class Config {
 }
 
 date_default_timezone_set('UTC');
-
-?>

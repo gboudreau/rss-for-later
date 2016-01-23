@@ -14,43 +14,45 @@ class RSS {
 
         $user_id = $user->id;
 
-        $q = "SELECT uf.* FROM users u JOIN users_feeds uf ON (u.id = uf.user_id) WHERE u.uuid = :uuid";
+        $q = "SELECT uf.* FROM users u JOIN users_feeds uf ON (u.id = uf.user_id) WHERE u.uuid = :uuid AND uf.xmlUrl != 'https://twitter.com'";
         $feeds = DB::getAll($q, array('uuid' => $uuid));
 
         foreach ($feeds as $feed) {
             static::log("[$feed->title] $feed->xmlUrl");
 
-            $url = 'http://pipes.yahoo.com/pipes/pipe.run?_id=' . Config::YAHOO_PIPE_INJECT_ID . '&_render=php&feedTitle=' . urlencode($feed->title) . '&feedUrl=' . urlencode($feed->xmlUrl);
-
-            $response = static::curl_get_content($url);
-            if (!$response) {
+            $rss_parser = new RSSParser($feed->xmlUrl);
+            if (!$rss_parser) {
                 continue;
             }
-            $feedXml = unserialize($response);
+            $feedXml = $rss_parser->getRawOutput();
             if (!$feedXml) {
-                error_log("Error de-serializing response from Yahoo Pipes:");
-                error_log(var_export($response, TRUE));
+                error_log("Error downloading RSS from $feed->xmlUrl.");
                 continue;
             }
 
-            static::log("  Received " . $feedXml['count'] . " items.");
+            $feedXml = $feedXml['RSS']['CHANNEL'][0];
+            static::log("  Received " . count($feedXml['ITEM']) . " items.");
+
+            if (!is_array($feedXml['ITEM'])) {
+                continue;
+            }
 
             $hashes = array();
             $items = array();
-            foreach ($feedXml['value']['items'] as $item) {
-                if (empty($item['link'])) {
+            foreach ($feedXml['ITEM'] as $item) {
+                if (empty($item['LINK'])) {
                     continue;
                 }
-                if (is_array($item['description'])) {
-                    $item['description'] = array_shift($item['description']);
+                if (is_array($item['DESCRIPTION'])) {
+                    $item['DESCRIPTION'] = array_shift($item['DESCRIPTION']);
                 }
                 $hash = static::get_item_hash($item);
                 $hashes[$hash] = TRUE;
                 $items[$hash] = (object) array(
-                    'url' => $item['link'],
-                    'title' => $item['title'],
-                    'tags' => array('RSS', $item['feedTitle']),
-                    'content' => '<h2>' . $item['title'] . '</h2>' . $item['description']
+                    'url' => $item['LINK'],
+                    'title' => stripslashes($item['TITLE']),
+                    'tags' => array('RSS', stripslashes($feedXml['TITLE'])),
+                    'content' => '<h2>' . stripslashes($item['TITLE']) . '</h2>' . html_entity_decode(stripslashes($item['DESCRIPTION']), ENT_COMPAT | ENT_HTML401, 'UTF-8')
                 );
             }
 
@@ -69,7 +71,7 @@ class RSS {
                     $values[$hash] = "($user_id,$feed->id,'$hash')";
                     static::log("  New article: " . $items[$hash]->title);
 
-                    if ($feed->mirror_articles_locally == 'true') {
+                    if (!$initial_load && $feed->mirror_articles_locally == 'true') {
                         // Save the article content locally, and send to Pocket this new URL.
                         $q = "INSERT INTO local_articles SET user_id = :user_id, feed_id = :feed_id, content=:content";
                         $local_article_id = DB::insert($q, array('user_id' => $user->id, 'feed_id' => $feed->id, 'content' => $items[$hash]->content));
@@ -99,10 +101,10 @@ class RSS {
 
     private static function get_item_hash($item) {
         // Bad, bad Google Alerts, inserting random IDs in links!
-        $item['link'] = preg_replace('/&ei=[^&]+/', '', $item['link']);
+        $item['LINK'] = preg_replace('/&ei=[^&]+/', '', $item['LINK']);
 
-        $hash = md5($item['link'] . @$item['guid']['content'] . @$item['pubDate'] . @$item['y:id']['value']);
-        //static::log("  Hash for (link: " . $item['link'] . ", guid: " . @$item['guid']['content'] . ", pubDate: " . @$item['pubDate'] . ", y:id: " . @$item['y:id']['value'] . "): $hash");
+        $hash = md5($item['LINK'] . @$item['GUID'] . @$item['PUBDATE']);
+        //static::log("  Hash for (link: " . $item['LINK'] . ", guid: " . @$item['GUID'] . ", pubDate: " . @$item['PUBDATE'] . "): $hash");
         return $hash;
 	}
 
@@ -112,30 +114,4 @@ class RSS {
             echo "<br/>";
         }
     }
-
-    private static function curl_get_content($url) {
-        echo('curl -si ' . escapeshellarg($url)."\n");
-        $response = shell_exec('curl -si ' . escapeshellarg($url));
-        $response = explode("\n", $response);
-        $status_code = trim(array_shift($response));
-        if (preg_match('@HTTP/1\.. ([0-9]+) .+@', $status_code, $re)) {
-            $http_status = $re[1];
-        } else {
-            static::log("cURL (command-line) error: status code not found in first line of response: $status_code");
-            return FALSE;
-        }
-        if ($http_status != 200) {
-            static::log("cURL (command-line) error: status code = $http_status");
-            return FALSE;
-        }
-        while (count($response) > 0 && preg_match('/[^ ]+: .+/', trim($response[0]))) {
-            array_shift($response);
-        }
-        if (count($response) > 0 && trim($response[0]) == '') {
-            array_shift($response);
-        }
-        $data = implode("\n", $response);
-        return $data;
-    }
 }
-?>
