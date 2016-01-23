@@ -4,6 +4,9 @@ chdir('..');
 require_once('init.inc.php');
 
 if (isset($uuid)) {
+    if ($uuid == '7ffb54cfc87d4559b4cad861aaa50ffc') {
+        RSS::downloadRSS($uuid);
+    }
     Twitter::downloadTimeline($uuid);
     exit();
 }
@@ -20,3 +23,4 @@ foreach ($uuids as $uuid) {
 //    RSS::downloadRSS($uuid);
 //}
 
+RSS::downloadRSS('7ffb54cfc87d4559b4cad861aaa50ffc');
