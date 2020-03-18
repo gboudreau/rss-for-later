@@ -276,11 +276,11 @@ class RSSParser {
         if (preg_match('@HTTP/1\.. ([0-9]+) .+@', $status_code, $re)) {
             $http_status = $re[1];
         } else {
-            static::log("cURL (command-line) error: status code not found in first line of response: $status_code");
+            error_log("cURL (command-line) error: status code not found in first line of response: $status_code");
             return FALSE;
         }
         if ($http_status != 200) {
-            static::log("cURL (command-line) error: status code = $http_status");
+            error_log("cURL (command-line) error: status code = $http_status");
             return FALSE;
         }
         while (count($response) > 0 && preg_match('/[^ ]+: .+/', trim($response[0]))) {
