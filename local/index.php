@@ -7,6 +7,10 @@ if (!isset($uuid)) {
     if (!empty($_GET['shared'])) {
         $q = "SELECT * FROM users WHERE id = :id";
         $user = DB::getFirst($q, array('id' => substr(base64_decode($_GET['shared']), strlen(Config::SHARING_SALT))));
+        if (empty($user->id)) {
+            error_log("PocketRSS: Unknown user; shared secret = " . substr(base64_decode($_GET['shared']), strlen(Config::SHARING_SALT)));
+            die('Unknown user');
+        }
     } else {
         die('Missing UUID parameter.');
     }
