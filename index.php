@@ -84,6 +84,7 @@ if (!empty($_POST['email'])) {
         require_once('libs/simplepie_1.3.1.compiled.php');
         $feed = new SimplePie();
         $feed->set_feed_url($_POST['xmlUrl']);
+        $feed->force_feed(TRUE);
         $feed->init();
         $_POST['title'] = $feed->get_title();
     }
